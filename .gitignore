@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Database — every developer has their own local copy
+todos.db
+
+# Environment variables — never commit secrets
+.env
+.env.local
+
+# React / Node
+node_modules/
+dist/
+.DS_Store
