@@ -1,0 +1,269 @@
+/* ── Global reset ─────────────────────────────────────────── */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #fdf6ec;   /* warm cream background */
+    color: #3b2a1a;        /* warm dark brown text */
+    min-height: 100vh;
+}
+
+/* ── App wrapper ──────────────────────────────────────────── */
+.app {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+.app-header {
+    text-align: center;
+}
+
+.app-header h1 {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #c94a00;        /* burnt orange */
+    letter-spacing: -1px;
+}
+
+.subtitle {
+    margin-top: 6px;
+    color: #9a7055;        /* warm muted brown */
+    font-size: 1rem;
+}
+
+/* ── Two-column grid ────────────────────────────────────────
+   Left column (sidebar) is narrower, right column (task area)
+   takes the remaining space.                                  */
+.grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;  /* fixed left, flexible right */
+    gap: 24px;
+    align-items: start;                /* columns don't stretch to equal height */
+}
+
+/* ── Sidebar (left column) ───────────────────────────────── */
+.sidebar {
+    background: #fff8f0;   /* warm white */
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 12px rgba(180, 90, 20, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.sidebar h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #c94a00;
+}
+
+.filter-heading {
+    margin-top: 8px;
+}
+
+/* ── Task form ────────────────────────────────────────────── */
+.task-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.task-form input {
+    padding: 10px 12px;
+    border: 1.5px solid #e8d5c0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: white;
+    color: #3b2a1a;
+    outline: none;
+}
+
+.task-form input:focus {
+    border-color: #e8610a;
+    box-shadow: 0 0 0 3px rgba(232, 97, 10, 0.12);
+}
+
+.task-form input::placeholder {
+    color: #c4a882;
+}
+
+.task-form button {
+    padding: 10px;
+    background: #e8610a;   /* warm orange */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.task-form button:hover {
+    background: #c94a00;
+}
+
+/* ── Filter buttons ───────────────────────────────────────── */
+.filters {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.filters button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 14px;
+    border: 1.5px solid #e8d5c0;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #7a5c3e;
+    transition: all 0.15s;
+    text-align: left;
+}
+
+.filters button:hover {
+    border-color: #e8610a;
+    color: #e8610a;
+}
+
+.filters button.active {
+    background: #e8610a;
+    border-color: #e8610a;
+    color: white;
+}
+
+/* Small count badge inside each filter button */
+.badge {
+    background: rgba(0,0,0,0.12);
+    border-radius: 20px;
+    padding: 1px 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.filters button.active .badge {
+    background: rgba(255,255,255,0.25);
+}
+
+/* ── Task area (right column) ─────────────────────────────── */
+.task-area {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.task-area h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #3b2a1a;
+}
+
+/* ── Task list ────────────────────────────────────────────── */
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.empty-message {
+    text-align: center;
+    color: #c4a882;
+    padding: 48px 0;
+    font-size: 1rem;
+}
+
+/* ── Task card ────────────────────────────────────────────── */
+.task-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: #fff8f0;
+    padding: 16px 18px;
+    border-radius: 12px;
+    border-left: 4px solid #e8610a;   /* warm orange accent stripe */
+    box-shadow: 0 1px 6px rgba(180, 90, 20, 0.07);
+    transition: opacity 0.2s, border-color 0.2s;
+}
+
+.task-card.completed {
+    opacity: 0.5;
+    border-left-color: #c4a882;       /* muted when done */
+}
+
+.task-card input[type="checkbox"] {
+    margin-top: 3px;
+    width: 17px;
+    height: 17px;
+    cursor: pointer;
+    flex-shrink: 0;
+    accent-color: #e8610a;            /* colours the checkbox itself */
+}
+
+.task-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.task-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #3b2a1a;
+}
+
+.task-card.completed .task-title {
+    text-decoration: line-through;
+    color: #9a7055;
+}
+
+.task-description {
+    font-size: 0.875rem;
+    color: #9a7055;
+}
+
+.task-due-date {
+    font-size: 0.8rem;
+    color: #c4a882;
+    font-style: italic;
+}
+
+/* ── Delete button ────────────────────────────────────────── */
+.delete-button {
+    padding: 4px 10px;
+    background: transparent;
+    border: 1.5px solid #f9c0a0;
+    border-radius: 6px;
+    color: #e8610a;
+    cursor: pointer;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+
+.delete-button:hover {
+    background: #fde8d8;
+}
+
+/* ── Responsive — stack to single column on small screens ─── */
+@media (max-width: 700px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
