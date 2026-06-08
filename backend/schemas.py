@@ -1,4 +1,14 @@
-from pydantic import BaseModel
+from datetime import datetime
+from pydantic import BaseModel, field_validator
+
+
+def validate_iso_date(v):
+    if v is not None:
+        try:
+            datetime.strptime(v, "%Y-%m-%d")
+        except ValueError:
+            raise ValueError("due_date must be in YYYY-MM-DD format")
+    return v
 
 
 # Used for POST /tasks (creating a new task).
@@ -10,6 +20,11 @@ class TaskCreate(BaseModel):
     description: str | None = None
     due_date: str | None = None
 
+    @field_validator("due_date")
+    @classmethod
+    def validate_due_date(cls, v):
+        return validate_iso_date(v)
+
 
 # Used for PATCH /tasks/{id} (updating an existing task).
 # Every field is optional — the frontend sends only what it wants to change.
@@ -19,6 +34,11 @@ class TaskUpdate(BaseModel):
     description: str | None = None
     due_date: str | None = None
     completed: int | None = None
+
+    @field_validator("due_date")
+    @classmethod
+    def validate_due_date(cls, v):
+        return validate_iso_date(v)
 
 
 # Used in every response back to the frontend.
