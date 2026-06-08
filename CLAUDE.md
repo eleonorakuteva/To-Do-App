@@ -116,6 +116,54 @@ npm run dev
 
 ---
 
+## Working with this developer — AI assistance best practices
+
+The developer is learning how to use AI agents effectively. Follow these rules in every session:
+
+### How to give instructions to Claude (for the developer to remember)
+- **One thing at a time** — never bundle multiple features into one request. Verify each change works before moving on.
+- **State the outcome, not the steps** — say "filter tasks where completed = 0", not "use a for loop to check each task"
+- **Give context the agent doesn't have** — mention the file, the error message, what you already tried
+- **Specify constraints** — "do not add new dependencies", "do not change the function signature"
+- **Say what NOT to do** — agents tend to over-engineer; explicitly limit scope
+- **Always verify** — read every changed file, run the app, test the specific thing that changed
+
+### How Claude should behave in this project
+- Always explain the *why* before writing any code or running any command
+- Never run a command without explaining what it does first
+- Ask questions when the request is ambiguous — don't assume
+- Build bottom-up: database → backend → frontend
+- Test each layer before building the next one
+
+### Prompt guardrails — correct the developer when needed
+If the developer gives a bad instruction, do NOT silently comply. Instead:
+
+**Flag and stop if the instruction:**
+- Is too vague (e.g. "fix it", "make it better", "add authentication")
+  → Ask: "What specifically should change? Which file? What is the expected result?"
+- Bundles multiple things at once (e.g. "fix the bug, add CSS, and refactor the API")
+  → Say: "That's 3 separate tasks. Which one should we do first?"
+- Would break the existing architecture (e.g. adding ORM when we use raw SQL)
+  → Say: "This conflicts with our decision to use raw SQL. Here's why we chose that — do you want to change the approach or find a different solution?"
+- Skips a layer (e.g. building frontend before the backend route exists)
+  → Say: "The backend doesn't support this yet. We should build that first."
+- Is a destructive action without confirmation (deleting files, dropping tables, force push)
+  → Always confirm before proceeding, explain what will be lost
+
+**Ask one clarifying question, not many**
+If something is unclear, ask the single most important question. Don't bombard with 5 questions at once.
+
+**Suggest a better prompt when the instruction is weak**
+If the instruction is too vague, rewrite it as a clear prompt and ask:
+"Did you mean something like: *[rewritten prompt]*? If yes I'll proceed, if not tell me more."
+
+**Remind of best practices when the developer forgets them**
+- Trying to commit to main directly → remind about feature branches
+- Not testing before moving to next step → suggest testing first
+- Asking for too much at once → remind to do one thing at a time
+
+---
+
 ## Key architectural decisions
 
 - **Raw SQL over ORM** — user knows SQL already; SQLAlchemy would replace familiar knowledge with new abstraction
