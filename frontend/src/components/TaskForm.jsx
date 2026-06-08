@@ -11,6 +11,14 @@ function TaskForm({ onAdd }) {
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
     const [dueDate, setDueDate] = useState('')
+    const [dateError, setDateError] = useState('')
+
+    function isValidDate(value) {
+        // Must match YYYY-MM-DD and be a real calendar date
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
+        const date = new Date(value)
+        return !isNaN(date.getTime())
+    }
 
     async function handleSubmit(event) {
         // Prevent the browser's default form behaviour (which would
@@ -20,6 +28,12 @@ function TaskForm({ onAdd }) {
         // title.trim() removes whitespace — don't submit an empty title
         if (!title.trim()) return
 
+        // Validate due date if provided
+        if (dueDate && !isValidDate(dueDate)) {
+            setDateError('Please enter a valid date in DD-MM-YYYY format')
+            return
+        }
+
         // Call the onAdd function passed in as a prop,
         // with the form data as an object
         await onAdd({ title, description, due_date: dueDate })
@@ -28,6 +42,7 @@ function TaskForm({ onAdd }) {
         setTitle('')
         setDescription('')
         setDueDate('')
+        setDateError('')
     }
 
     return (
@@ -54,8 +69,12 @@ function TaskForm({ onAdd }) {
             <input
                 type="date"
                 value={dueDate}
-                onChange={(event) => setDueDate(event.target.value)}
+                onChange={(event) => {
+                    setDueDate(event.target.value)
+                    setDateError('')
+                }}
             />
+            {dateError && <span className="date-error">{dateError}</span>}
 
             <button type="submit">Add Task</button>
 
