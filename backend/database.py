@@ -29,9 +29,80 @@ def create_table():
                 description TEXT,
                 due_date    TEXT,
                 completed   INTEGER NOT NULL DEFAULT 0,
-                created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
+                created_at  TEXT    NOT NULL DEFAULT (datetime('now')),
+                -- Every task belongs to a project (your requirement).
+                -- REFERENCES documents that this points at projects.id.
+                project_id  INTEGER NOT NULL REFERENCES projects(id)
             )
         """)
+
+
+def create_projects_table():
+    # A "project" is a category a task belongs to (e.g. Work, Personal).
+    # Tasks will point at a project later — for now we just create the table.
+    with get_connection() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS projects (
+                id    INTEGER PRIMARY KEY AUTOINCREMENT,
+                name  TEXT NOT NULL UNIQUE,
+                color TEXT NOT NULL
+            )
+        """)
+        # Seed a small set of starter projects, each with a distinct color.
+        # INSERT OR IGNORE does nothing if a project name already exists
+        # (the UNIQUE constraint on name blocks the duplicate), so this is
+        # safe to run every time the app starts. "General" is listed first
+        # so it gets id=1 and stays the default.
+        starter_projects = [
+            ("General", "#888888"),   # grey  — neutral default
+            ("Home", "#4caf50"),      # green — domestic
+            ("Work", "#4f9cff"),      # blue  — professional
+            ("Personal", "#e91e63"),  # pink  — self
+            ("Study", "#ff9800"),     # orange— learning
+        ]
+        conn.executemany(
+            "INSERT OR IGNORE INTO projects (name, color) VALUES (?, ?)",
+            starter_projects,
+        )
+
+
+def get_all_projects():
+    with get_connection() as conn:
+        # ORDER BY id keeps "General" (created first) at the top of the list.
+        rows = conn.execute("SELECT * FROM projects ORDER BY id").fetchall()
+        return [dict(row) for row in rows]
+
+
+def get_project_by_id(project_id: int):
+    with get_connection() as conn:
+        row = conn.execute(
+            "SELECT * FROM projects WHERE id = ?", (project_id,)
+        ).fetchone()
+        return dict(row) if row else None
+
+
+def create_project(name: str, color: str):
+    # If name duplicates an existing project, the UNIQUE constraint makes
+    # SQLite raise sqlite3.IntegrityError. We let it bubble up so the route
+    # can turn it into a clean HTTP error instead of a crash.
+    with get_connection() as conn:
+        cursor = conn.execute(
+            "INSERT INTO projects (name, color) VALUES (?, ?)",
+            (name, color),
+        )
+        new_id = cursor.lastrowid
+    return get_project_by_id(new_id)
+
+
+def get_default_project_id():
+    # Look up the "General" project by name and return its id.
+    # We find it by name (not a hardcoded id=1) so the default keeps
+    # working even if ids ever change.
+    with get_connection() as conn:
+        row = conn.execute(
+            "SELECT id FROM projects WHERE name = ?", ("General",)
+        ).fetchone()
+        return row["id"] if row else None
 
 
 def get_all_tasks():
@@ -55,13 +126,23 @@ def get_task_by_id(task_id: int):
         return dict(row) if row else None
 
 
-def create_task(title: str, description: str | None, due_date: str | None):
+def create_task(
+    title: str,
+    description: str | None,
+    due_date: str | None,
+    project_id: int | None = None,
+):
+    # If the caller didn't say which project, fall back to "General".
+    # (Letting the API client choose a project comes in a later step.)
+    if project_id is None:
+        project_id = get_default_project_id()
+
     with get_connection() as conn:
         # The ? placeholders are filled in by SQLite from the tuple.
         # NEVER use f-strings to build SQL — that opens a SQL injection vulnerability.
         cursor = conn.execute(
-            "INSERT INTO tasks (title, description, due_date) VALUES (?, ?, ?)",
-            (title, description, due_date),
+            "INSERT INTO tasks (title, description, due_date, project_id) VALUES (?, ?, ?, ?)",
+            (title, description, due_date, project_id),
         )
         new_id = cursor.lastrowid
     # Fetch AFTER the with-block closes, because that's when SQLite commits

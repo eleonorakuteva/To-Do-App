@@ -19,6 +19,9 @@ class TaskCreate(BaseModel):
     title: str
     description: str | None = None
     due_date: str | None = None
+    # Optional: which project the task belongs to.
+    # If omitted, create_task() falls back to the "General" project.
+    project_id: int | None = None
 
     @field_validator("due_date")
     @classmethod
@@ -34,11 +37,29 @@ class TaskUpdate(BaseModel):
     description: str | None = None
     due_date: str | None = None
     completed: int | None = None
+    # Lets a task be moved to a different project.
+    project_id: int | None = None
 
     @field_validator("due_date")
     @classmethod
     def validate_due_date(cls, v):
         return validate_iso_date(v)
+
+
+# Used for POST /projects (creating a new project — "Add New Project").
+# name is required; color is optional and falls back to a neutral grey
+# so the API still works if the frontend doesn't send one.
+class ProjectCreate(BaseModel):
+    name: str
+    color: str = "#888888"
+
+
+# Used in responses for project routes.
+# This is the full shape of a project as stored in the database.
+class ProjectResponse(BaseModel):
+    id: int
+    name: str
+    color: str
 
 
 # Used in every response back to the frontend.
@@ -51,3 +72,4 @@ class TaskResponse(BaseModel):
     due_date: str | None
     completed: int
     created_at: str
+    project_id: int
