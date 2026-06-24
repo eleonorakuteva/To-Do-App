@@ -1,92 +1,108 @@
 import { useState, useEffect } from 'react'
-import { getProjects, createProject } from '../api'
+import TaskList from '../components/TaskList'
+import { getProjects, getTasks, updateTask, deleteTask } from '../api'
 
 // ProjectsPage is the "/projects" route.
-// It lists all projects and provides the "Add New Project" form.
+// It lets you browse tasks by project: pick a project on the left and its
+// tasks show on the right. Each project shows how many tasks are active/done.
 function ProjectsPage() {
     const [projects, setProjects] = useState([])
-    const [name, setName] = useState('')
-    // Native colour picker value — a hex string like "#4caf50".
-    const [color, setColor] = useState('#4caf50')
-    const [error, setError] = useState('')
+    const [tasks, setTasks] = useState([])
+    // Which project is being viewed. null means "All projects".
+    const [selectedProjectId, setSelectedProjectId] = useState(null)
 
     useEffect(() => {
         loadProjects()
+        loadTasks()
     }, [])
 
     async function loadProjects() {
-        const data = await getProjects()
-        setProjects(data)
+        setProjects(await getProjects())
     }
 
-    async function handleSubmit(event) {
-        event.preventDefault()
+    async function loadTasks() {
+        setTasks(await getTasks())
+    }
 
-        if (!name.trim()) return
+    // Toggle / delete work here too, since we reuse TaskList. Because the
+    // counts below are derived from `tasks`, they update automatically.
+    async function handleToggle(id, currentCompleted) {
+        const updated = await updateTask(id, {
+            completed: currentCompleted === 1 ? 0 : 1
+        })
+        setTasks(prev => prev.map(task => task.id === id ? updated : task))
+    }
 
-        const created = await createProject({ name: name.trim(), color })
+    async function handleDelete(id) {
+        await deleteTask(id)
+        setTasks(prev => prev.filter(task => task.id !== id))
+    }
 
-        // A successful create returns the new project (it has an id).
-        // A duplicate name returns { detail: "..." } with no id (HTTP 409),
-        // so we show that message instead of adding it to the list.
-        if (!created.id) {
-            setError(created.detail || 'Could not create project')
-            return
+    // Count active/done tasks for a project. projectId === null counts all.
+    function countsFor(projectId) {
+        const inProject = projectId === null
+            ? tasks
+            : tasks.filter(task => task.project_id === projectId)
+        return {
+            active: inProject.filter(task => task.completed === 0).length,
+            done: inProject.filter(task => task.completed === 1).length,
         }
-
-        setProjects(prev => [...prev, created])
-        setName('')
-        setError('')
     }
+
+    const visibleTasks = selectedProjectId === null
+        ? tasks
+        : tasks.filter(task => task.project_id === selectedProjectId)
+
+    const selectedProject = projects.find(p => p.id === selectedProjectId)
 
     return (
         <div className="grid">
 
-            {/* Left column — add a new project */}
+            {/* Left column — choose a project (or All) */}
             <aside className="sidebar">
-                <h2>Add New Project</h2>
-                <form className="task-form" onSubmit={handleSubmit}>
-                    <input
-                        type="text"
-                        placeholder="Project name (required)"
-                        value={name}
-                        onChange={(event) => {
-                            setName(event.target.value)
-                            setError('')
-                        }}
-                        required
-                    />
+                <h2>Projects</h2>
+                <div className="project-filter-list">
 
-                    {/* Native colour picker */}
-                    <label className="color-field">
-                        Colour
-                        <input
-                            type="color"
-                            value={color}
-                            onChange={(event) => setColor(event.target.value)}
-                        />
-                    </label>
+                    {/* All projects */}
+                    <button
+                        className={`project-filter ${selectedProjectId === null ? 'active' : ''}`}
+                        onClick={() => setSelectedProjectId(null)}
+                    >
+                        <span className="pf-name">All</span>
+                        <span className="pf-counts">
+                            {countsFor(null).active} active · {countsFor(null).done} done
+                        </span>
+                    </button>
 
-                    {error && <span className="date-error">{error}</span>}
-
-                    <button type="submit">Add Project</button>
-                </form>
+                    {projects.map(project => {
+                        const { active, done } = countsFor(project.id)
+                        return (
+                            <button
+                                key={project.id}
+                                className={`project-filter ${selectedProjectId === project.id ? 'active' : ''}`}
+                                onClick={() => setSelectedProjectId(project.id)}
+                            >
+                                <span
+                                    className="project-swatch"
+                                    style={{ backgroundColor: project.color }}
+                                />
+                                <span className="pf-name">{project.name}</span>
+                                <span className="pf-counts">{active} active · {done} done</span>
+                            </button>
+                        )
+                    })}
+                </div>
             </aside>
 
-            {/* Right column — list of all projects */}
+            {/* Right column — tasks for the selected project */}
             <main className="task-area">
-                <h2>Projects</h2>
-                <div className="project-list">
-                    {projects.map(project => (
-                        <div className="project-row" key={project.id}>
-                            <span
-                                className="project-swatch"
-                                style={{ backgroundColor: project.color }}
-                            />
-                            <span className="project-name">{project.name}</span>
-                        </div>
-                    ))}
-                </div>
+                <h2>{selectedProject ? selectedProject.name : 'All Tasks'}</h2>
+                <TaskList
+                    tasks={visibleTasks}
+                    projects={projects}
+                    onToggle={handleToggle}
+                    onDelete={handleDelete}
+                />
             </main>
 
         </div>

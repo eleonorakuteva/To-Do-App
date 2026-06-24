@@ -207,34 +207,52 @@ body {
     color: #e8610a;
 }
 
-/* ── Project list (Projects page) ─────────────────────────── */
-.project-list {
+/* ── Project browser (Projects page) ──────────────────────── */
+.project-filter-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
 }
 
-.project-row {
+.project-filter {
     display: flex;
     align-items: center;
-    gap: 12px;
-    background: #fff8f0;
-    padding: 14px 18px;
-    border-radius: 12px;
-    box-shadow: 0 1px 6px rgba(180, 90, 20, 0.07);
+    gap: 10px;
+    padding: 9px 14px;
+    border: 1.5px solid #e8d5c0;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+}
+
+.project-filter:hover {
+    border-color: #e8610a;
+}
+
+.project-filter.active {
+    border-color: #e8610a;
+    background: #fff1e6;
 }
 
 /* Round colour dot — filled inline with the project's colour */
 .project-swatch {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     flex-shrink: 0;
 }
 
-.project-name {
+.pf-name {
     font-weight: 600;
     color: #3b2a1a;
+    flex: 1;
+}
+
+.pf-counts {
+    font-size: 0.76rem;
+    color: #9a7055;
 }
 
 /* ── Filter buttons ───────────────────────────────────────── */
