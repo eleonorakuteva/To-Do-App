@@ -1,8 +1,16 @@
+import sqlite3
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 import database
-from schemas import TaskCreate, TaskUpdate, TaskResponse
+from schemas import (
+    TaskCreate,
+    TaskUpdate,
+    TaskResponse,
+    ProjectCreate,
+    ProjectResponse,
+)
 
 # Create the FastAPI application instance.
 # This object is what uvicorn runs when you do: uvicorn main:app
@@ -69,6 +77,26 @@ def update_task(task_id: int, data: TaskUpdate):
         raise HTTPException(status_code=404, detail="Task not found")
     fields = data.model_dump(exclude_unset=True)
     return database.update_task(task_id, fields)
+
+
+@app.get("/projects", response_model=list[ProjectResponse])
+def get_projects():
+    # GET /projects — return all projects ("General" first).
+    # The frontend dropdown reads this list.
+    return database.get_all_projects()
+
+
+@app.post("/projects", response_model=ProjectResponse, status_code=201)
+def create_project(data: ProjectCreate):
+    # POST /projects — create a custom project ("Add New Project").
+    # If the name already exists, the UNIQUE constraint raises IntegrityError,
+    # which we turn into 409 Conflict instead of a 500 crash.
+    try:
+        return database.create_project(data.name, data.color)
+    except sqlite3.IntegrityError:
+        raise HTTPException(
+            status_code=409, detail="A project with this name already exists"
+        )
 
 
 @app.delete("/tasks/{task_id}")

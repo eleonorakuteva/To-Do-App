@@ -58,6 +58,34 @@ def create_projects_table():
         )
 
 
+def get_all_projects():
+    with get_connection() as conn:
+        # ORDER BY id keeps "General" (created first) at the top of the list.
+        rows = conn.execute("SELECT * FROM projects ORDER BY id").fetchall()
+        return [dict(row) for row in rows]
+
+
+def get_project_by_id(project_id: int):
+    with get_connection() as conn:
+        row = conn.execute(
+            "SELECT * FROM projects WHERE id = ?", (project_id,)
+        ).fetchone()
+        return dict(row) if row else None
+
+
+def create_project(name: str, color: str):
+    # If name duplicates an existing project, the UNIQUE constraint makes
+    # SQLite raise sqlite3.IntegrityError. We let it bubble up so the route
+    # can turn it into a clean HTTP error instead of a crash.
+    with get_connection() as conn:
+        cursor = conn.execute(
+            "INSERT INTO projects (name, color) VALUES (?, ?)",
+            (name, color),
+        )
+        new_id = cursor.lastrowid
+    return get_project_by_id(new_id)
+
+
 def get_default_project_id():
     # Look up the "General" project by name and return its id.
     # We find it by name (not a hardcoded id=1) so the default keeps

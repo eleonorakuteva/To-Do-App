@@ -41,6 +41,22 @@ class TaskUpdate(BaseModel):
         return validate_iso_date(v)
 
 
+# Used for POST /projects (creating a new project — "Add New Project").
+# name is required; color is optional and falls back to a neutral grey
+# so the API still works if the frontend doesn't send one.
+class ProjectCreate(BaseModel):
+    name: str
+    color: str = "#888888"
+
+
+# Used in responses for project routes.
+# This is the full shape of a project as stored in the database.
+class ProjectResponse(BaseModel):
+    id: int
+    name: str
+    color: str
+
+
 # Used in every response back to the frontend.
 # This is the full shape of a task as stored in the database.
 # The frontend reads this to know the id, whether it's done, when it was created, etc.
