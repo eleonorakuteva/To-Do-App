@@ -19,6 +19,9 @@ class TaskCreate(BaseModel):
     title: str
     description: str | None = None
     due_date: str | None = None
+    # Optional: which project the task belongs to.
+    # If omitted, create_task() falls back to the "General" project.
+    project_id: int | None = None
 
     @field_validator("due_date")
     @classmethod
@@ -34,6 +37,8 @@ class TaskUpdate(BaseModel):
     description: str | None = None
     due_date: str | None = None
     completed: int | None = None
+    # Lets a task be moved to a different project.
+    project_id: int | None = None
 
     @field_validator("due_date")
     @classmethod
@@ -67,3 +72,4 @@ class TaskResponse(BaseModel):
     due_date: str | None
     completed: int
     created_at: str
+    project_id: int

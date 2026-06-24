@@ -48,13 +48,21 @@ def create_projects_table():
                 color TEXT NOT NULL
             )
         """)
-        # Seed the default "General" project.
-        # INSERT OR IGNORE does nothing if a project named "General" already
-        # exists (the UNIQUE constraint on name blocks the duplicate).
-        # That makes this safe to run every time the app starts.
-        conn.execute(
+        # Seed a small set of starter projects, each with a distinct color.
+        # INSERT OR IGNORE does nothing if a project name already exists
+        # (the UNIQUE constraint on name blocks the duplicate), so this is
+        # safe to run every time the app starts. "General" is listed first
+        # so it gets id=1 and stays the default.
+        starter_projects = [
+            ("General", "#888888"),   # grey  — neutral default
+            ("Home", "#4caf50"),      # green — domestic
+            ("Work", "#4f9cff"),      # blue  — professional
+            ("Personal", "#e91e63"),  # pink  — self
+            ("Study", "#ff9800"),     # orange— learning
+        ]
+        conn.executemany(
             "INSERT OR IGNORE INTO projects (name, color) VALUES (?, ?)",
-            ("General", "#888888"),
+            starter_projects,
         )
 
 

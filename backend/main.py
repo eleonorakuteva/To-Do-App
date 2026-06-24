@@ -64,7 +64,13 @@ def create_task(data: TaskCreate):
     # FastAPI validates the request body against TaskCreate automatically.
     # If title is missing, FastAPI returns 422 before this function even runs.
     # status_code=201 means "Created" — more precise than the default 200 "OK".
-    return database.create_task(data.title, data.description, data.due_date)
+    # If a project_id was sent, make sure it points at a real project.
+    # SQLite isn't enforcing the foreign key, so we check it here.
+    if data.project_id is not None and database.get_project_by_id(data.project_id) is None:
+        raise HTTPException(status_code=400, detail="project_id does not exist")
+    return database.create_task(
+        data.title, data.description, data.due_date, data.project_id
+    )
 
 
 @app.patch("/tasks/{task_id}", response_model=TaskResponse)
@@ -76,6 +82,9 @@ def update_task(task_id: int, data: TaskUpdate):
     if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
     fields = data.model_dump(exclude_unset=True)
+    # If the update moves the task to another project, validate it exists.
+    if "project_id" in fields and database.get_project_by_id(fields["project_id"]) is None:
+        raise HTTPException(status_code=400, detail="project_id does not exist")
     return database.update_task(task_id, fields)
 
 
