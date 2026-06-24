@@ -36,3 +36,20 @@ export async function updateTask(id, fields) {
 export async function deleteTask(id) {
     await fetch(`/tasks/${id}`, { method: 'DELETE' })
 }
+
+// GET /projects — fetch all projects (General first)
+export async function getProjects() {
+    const response = await fetch('/projects')
+    return response.json()
+}
+
+// POST /projects — create a new project ("Add New Project")
+// projectData is an object like { name: "Hobbies", color: "#9c27b0" }
+export async function createProject(projectData) {
+    const response = await fetch('/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(projectData),
+    })
+    return response.json()
+}

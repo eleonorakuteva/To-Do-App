@@ -40,6 +40,38 @@ body {
     font-size: 1rem;
 }
 
+/* ── Main nav (Tasks / Projects) ──────────────────────────── */
+.main-nav {
+    margin-top: 18px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.main-nav a {
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: 1.5px solid #e8d5c0;
+    background: white;
+    color: #7a5c3e;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.15s;
+}
+
+.main-nav a:hover {
+    border-color: #e8610a;
+    color: #e8610a;
+}
+
+/* NavLink adds .active to the link matching the current URL */
+.main-nav a.active {
+    background: #e8610a;
+    border-color: #e8610a;
+    color: white;
+}
+
 /* ── Two-column grid ────────────────────────────────────────
    Left column (sidebar) is narrower, right column (task area)
    takes the remaining space.                                  */
@@ -80,7 +112,8 @@ body {
     gap: 10px;
 }
 
-.task-form input {
+.task-form input,
+.task-form select {
     padding: 10px 12px;
     border: 1.5px solid #e8d5c0;
     border-radius: 8px;
@@ -90,7 +123,8 @@ body {
     outline: none;
 }
 
-.task-form input:focus {
+.task-form input:focus,
+.task-form select:focus {
     border-color: #e8610a;
     box-shadow: 0 0 0 3px rgba(232, 97, 10, 0.12);
 }
@@ -113,6 +147,112 @@ body {
 
 .task-form button:hover {
     background: #c94a00;
+}
+
+/* Inline error message under a form field */
+.date-error {
+    color: #c0392b;
+    font-size: 0.8rem;
+}
+
+/* Colour picker row in the "Add New Project" form */
+.color-field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: #7a5c3e;
+}
+
+.color-field input[type="color"] {
+    width: 48px;
+    height: 32px;
+    border: 1.5px solid #e8d5c0;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    padding: 2px;
+}
+
+/* Inline "Add new project" box inside the task form */
+.add-project-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border: 1.5px dashed #e8d5c0;
+    border-radius: 8px;
+}
+
+.add-project-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.add-project-actions button {
+    flex: 1;
+}
+
+/* Secondary (Cancel) button — outlined instead of filled */
+.add-project-actions button.secondary {
+    background: white;
+    color: #7a5c3e;
+    border: 1.5px solid #e8d5c0;
+}
+
+.add-project-actions button.secondary:hover {
+    background: white;
+    border-color: #e8610a;
+    color: #e8610a;
+}
+
+/* ── Project browser (Projects page) ──────────────────────── */
+.project-filter-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.project-filter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    border: 1.5px solid #e8d5c0;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+}
+
+.project-filter:hover {
+    border-color: #e8610a;
+}
+
+.project-filter.active {
+    border-color: #e8610a;
+    background: #fff1e6;
+}
+
+/* Round colour dot — filled inline with the project's colour */
+.project-swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.pf-name {
+    font-weight: 600;
+    color: #3b2a1a;
+    flex: 1;
+}
+
+.pf-counts {
+    font-size: 0.76rem;
+    color: #9a7055;
 }
 
 /* ── Filter buttons ───────────────────────────────────────── */
@@ -242,6 +382,19 @@ body {
     font-size: 0.8rem;
     color: #c4a882;
     font-style: italic;
+}
+
+/* Small coloured pill showing which project the task belongs to.
+   Background colour is set inline from the project's colour. */
+.task-project {
+    align-self: flex-start;
+    margin-top: 4px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: white;
+    letter-spacing: 0.02em;
 }
 
 /* ── Delete button ────────────────────────────────────────── */
