@@ -175,6 +175,38 @@ body {
     padding: 2px;
 }
 
+/* Inline "Add new project" box inside the task form */
+.add-project-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border: 1.5px dashed #e8d5c0;
+    border-radius: 8px;
+}
+
+.add-project-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.add-project-actions button {
+    flex: 1;
+}
+
+/* Secondary (Cancel) button — outlined instead of filled */
+.add-project-actions button.secondary {
+    background: white;
+    color: #7a5c3e;
+    border: 1.5px solid #e8d5c0;
+}
+
+.add-project-actions button.secondary:hover {
+    background: white;
+    border-color: #e8610a;
+    color: #e8610a;
+}
+
 /* ── Project list (Projects page) ─────────────────────────── */
 .project-list {
     display: flex;

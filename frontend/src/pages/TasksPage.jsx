@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import TaskForm from '../components/TaskForm'
 import TaskList from '../components/TaskList'
-import { getTasks, createTask, updateTask, deleteTask, getProjects } from '../api'
+import { getTasks, createTask, updateTask, deleteTask, getProjects, createProject } from '../api'
 
 // TasksPage is the "/" route — the original to-do screen.
 // All task state and handlers live here now (moved out of App.jsx,
@@ -31,6 +31,17 @@ function TasksPage() {
         setTasks(prev => [newTask, ...prev])
     }
 
+    // Create a project from the inline form in TaskForm. On success, add it to
+    // the list so it appears in the dropdown. Returns the result either way so
+    // TaskForm can show an error (e.g. duplicate name) or select the new one.
+    async function handleAddProject(projectData) {
+        const created = await createProject(projectData)
+        if (created.id) {
+            setProjects(prev => [...prev, created])
+        }
+        return created
+    }
+
     async function handleToggle(id, currentCompleted) {
         const updated = await updateTask(id, {
             completed: currentCompleted === 1 ? 0 : 1
@@ -55,7 +66,11 @@ function TasksPage() {
             {/* Left column — add tasks + filters */}
             <aside className="sidebar">
                 <h2>Add a Task</h2>
-                <TaskForm onAdd={handleAdd} projects={projects} />
+                <TaskForm
+                    onAdd={handleAdd}
+                    projects={projects}
+                    onAddProject={handleAddProject}
+                />
 
                 <h2 className="filter-heading">Filter</h2>
                 <div className="filters">
