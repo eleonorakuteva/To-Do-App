@@ -13,6 +13,12 @@ export default defineConfig({
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
       },
+      // Same idea for projects: fetch('/projects') reaches FastAPI,
+      // not the Vite dev server.
+      '/projects': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      },
     },
   },
 })
