@@ -34,6 +34,27 @@ def create_table():
         """)
 
 
+def create_projects_table():
+    # A "project" is a category a task belongs to (e.g. Work, Personal).
+    # Tasks will point at a project later — for now we just create the table.
+    with get_connection() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS projects (
+                id    INTEGER PRIMARY KEY AUTOINCREMENT,
+                name  TEXT NOT NULL UNIQUE,
+                color TEXT NOT NULL
+            )
+        """)
+        # Seed the default "General" project.
+        # INSERT OR IGNORE does nothing if a project named "General" already
+        # exists (the UNIQUE constraint on name blocks the duplicate).
+        # That makes this safe to run every time the app starts.
+        conn.execute(
+            "INSERT OR IGNORE INTO projects (name, color) VALUES (?, ?)",
+            ("General", "#888888"),
+        )
+
+
 def get_all_tasks():
     with get_connection() as conn:
         # fetchall() returns a list of all matching rows.

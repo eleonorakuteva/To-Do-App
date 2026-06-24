@@ -18,9 +18,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# When the app starts, make sure the tasks table exists in todos.db.
+# When the app starts, make sure the tables exist in todos.db.
 # This runs once on startup — safe to call every time because of IF NOT EXISTS.
 database.create_table()
+database.create_projects_table()
 
 
 # --- Routes ---
