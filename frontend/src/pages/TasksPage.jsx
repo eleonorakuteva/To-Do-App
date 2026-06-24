@@ -96,6 +96,7 @@ function TasksPage() {
                 </h2>
                 <TaskList
                     tasks={visibleTasks}
+                    projects={projects}
                     onToggle={handleToggle}
                     onDelete={handleDelete}
                 />

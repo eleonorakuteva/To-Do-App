@@ -278,6 +278,19 @@ body {
     font-style: italic;
 }
 
+/* Small coloured pill showing which project the task belongs to.
+   Background colour is set inline from the project's colour. */
+.task-project {
+    align-self: flex-start;
+    margin-top: 4px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: white;
+    letter-spacing: 0.02em;
+}
+
 /* ── Delete button ────────────────────────────────────────── */
 .delete-button {
     padding: 4px 10px;
