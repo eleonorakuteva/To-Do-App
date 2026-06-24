@@ -29,7 +29,10 @@ def create_table():
                 description TEXT,
                 due_date    TEXT,
                 completed   INTEGER NOT NULL DEFAULT 0,
-                created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
+                created_at  TEXT    NOT NULL DEFAULT (datetime('now')),
+                -- Every task belongs to a project (your requirement).
+                -- REFERENCES documents that this points at projects.id.
+                project_id  INTEGER NOT NULL REFERENCES projects(id)
             )
         """)
 
@@ -55,6 +58,17 @@ def create_projects_table():
         )
 
 
+def get_default_project_id():
+    # Look up the "General" project by name and return its id.
+    # We find it by name (not a hardcoded id=1) so the default keeps
+    # working even if ids ever change.
+    with get_connection() as conn:
+        row = conn.execute(
+            "SELECT id FROM projects WHERE name = ?", ("General",)
+        ).fetchone()
+        return row["id"] if row else None
+
+
 def get_all_tasks():
     with get_connection() as conn:
         # fetchall() returns a list of all matching rows.
@@ -76,13 +90,23 @@ def get_task_by_id(task_id: int):
         return dict(row) if row else None
 
 
-def create_task(title: str, description: str | None, due_date: str | None):
+def create_task(
+    title: str,
+    description: str | None,
+    due_date: str | None,
+    project_id: int | None = None,
+):
+    # If the caller didn't say which project, fall back to "General".
+    # (Letting the API client choose a project comes in a later step.)
+    if project_id is None:
+        project_id = get_default_project_id()
+
     with get_connection() as conn:
         # The ? placeholders are filled in by SQLite from the tuple.
         # NEVER use f-strings to build SQL — that opens a SQL injection vulnerability.
         cursor = conn.execute(
-            "INSERT INTO tasks (title, description, due_date) VALUES (?, ?, ?)",
-            (title, description, due_date),
+            "INSERT INTO tasks (title, description, due_date, project_id) VALUES (?, ?, ?, ?)",
+            (title, description, due_date, project_id),
         )
         new_id = cursor.lastrowid
     # Fetch AFTER the with-block closes, because that's when SQLite commits
