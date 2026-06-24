@@ -112,7 +112,8 @@ body {
     gap: 10px;
 }
 
-.task-form input {
+.task-form input,
+.task-form select {
     padding: 10px 12px;
     border: 1.5px solid #e8d5c0;
     border-radius: 8px;
@@ -122,7 +123,8 @@ body {
     outline: none;
 }
 
-.task-form input:focus {
+.task-form input:focus,
+.task-form select:focus {
     border-color: #e8610a;
     box-shadow: 0 0 0 3px rgba(232, 97, 10, 0.12);
 }

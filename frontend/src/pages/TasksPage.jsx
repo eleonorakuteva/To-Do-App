@@ -1,22 +1,29 @@
 import { useState, useEffect } from 'react'
 import TaskForm from '../components/TaskForm'
 import TaskList from '../components/TaskList'
-import { getTasks, createTask, updateTask, deleteTask } from '../api'
+import { getTasks, createTask, updateTask, deleteTask, getProjects } from '../api'
 
 // TasksPage is the "/" route — the original to-do screen.
 // All task state and handlers live here now (moved out of App.jsx,
 // which became the shared layout when we added routing).
 function TasksPage() {
     const [tasks, setTasks] = useState([])
+    const [projects, setProjects] = useState([])
     const [filter, setFilter] = useState('all')
 
     useEffect(() => {
         loadTasks()
+        loadProjects()
     }, [])
 
     async function loadTasks() {
         const data = await getTasks()
         setTasks(data)
+    }
+
+    async function loadProjects() {
+        const data = await getProjects()
+        setProjects(data)
     }
 
     async function handleAdd(taskData) {
@@ -48,7 +55,7 @@ function TasksPage() {
             {/* Left column — add tasks + filters */}
             <aside className="sidebar">
                 <h2>Add a Task</h2>
-                <TaskForm onAdd={handleAdd} />
+                <TaskForm onAdd={handleAdd} projects={projects} />
 
                 <h2 className="filter-heading">Filter</h2>
                 <div className="filters">
