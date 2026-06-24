@@ -40,6 +40,38 @@ body {
     font-size: 1rem;
 }
 
+/* ── Main nav (Tasks / Projects) ──────────────────────────── */
+.main-nav {
+    margin-top: 18px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.main-nav a {
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: 1.5px solid #e8d5c0;
+    background: white;
+    color: #7a5c3e;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.15s;
+}
+
+.main-nav a:hover {
+    border-color: #e8610a;
+    color: #e8610a;
+}
+
+/* NavLink adds .active to the link matching the current URL */
+.main-nav a.active {
+    background: #e8610a;
+    border-color: #e8610a;
+    color: white;
+}
+
 /* ── Two-column grid ────────────────────────────────────────
    Left column (sidebar) is narrower, right column (task area)
    takes the remaining space.                                  */
